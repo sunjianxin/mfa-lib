@@ -9,10 +9,10 @@
 #ifndef _ENCODE_HPP
 #define _ENCODE_HPP
 
-#include    <mfa/mfa_data.hpp>
-#include    <mfa/mfa.hpp>
-#include    <mfa/decode.hpp>
-#include    <mfa/new_knots.hpp>
+#include    "mfa_data.hpp"
+#include    "mfa.hpp"
+#include    "decode.hpp"
+#include    "new_knots.hpp"
 
 #include    <vector>
 #include    <set>
@@ -24,7 +24,7 @@
 #include    <iomanip>
 #include    <fstream>
 #include    <sstream>
-#include    <mpi.h>     // for MPI_Wtime() only
+#include "/usr/local/include/mpi.h"
 
 #ifndef      MFA_NO_WEIGHTS
 

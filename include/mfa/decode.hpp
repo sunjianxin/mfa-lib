@@ -9,8 +9,8 @@
 #ifndef _DECODE_HPP
 #define _DECODE_HPP
 
-#include    <mfa/mfa_data.hpp>
-#include    <mfa/mfa.hpp>
+#include    "mfa_data.hpp"
+#include    "mfa.hpp"
 
 #include    <Eigen/Dense>
 

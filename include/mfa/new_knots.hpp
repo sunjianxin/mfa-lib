@@ -9,10 +9,10 @@
 #ifndef _NEW_KNOTS_HPP
 #define _NEW_KNOTS_HPP
 
-#include    <mfa/mfa_data.hpp>
-#include    <mfa/mfa.hpp>
-#include    <mfa/encode.hpp>
-#include    <mfa/decode.hpp>
+#include    "mfa_data.hpp"
+#include    "mfa.hpp"
+#include    "encode.hpp"
+#include    "decode.hpp"
 
 #include    <Eigen/Dense>
 #include    <vector>

@@ -76,13 +76,13 @@ using SpMatTriplet = Eigen::Triplet<T>;
 
 #include    <diy/thirdparty/fmt/format.h>
 
-#include    <mfa/util.hpp>
-#include    <mfa/param.hpp>
-#include    <mfa/pointset.hpp>
-#include    <mfa/tmesh.hpp>
-#include    <mfa/mfa_data.hpp>
-#include    <mfa/decode.hpp>
-#include    <mfa/encode.hpp>
+#include    "util.hpp"
+#include    "param.hpp"
+#include    "pointset.hpp"
+#include    "tmesh.hpp"
+#include    "mfa_data.hpp"
+#include    "decode.hpp"
+#include    "encode.hpp"
 
 // TODO: Move Model's from BlockBase to MFA
 //       Want MFA object to manage construction-destruction of MFA_Data

@@ -8,7 +8,7 @@
 #ifndef _PARAMS_HPP
 #define _PARAMS_HPP
 
-#include    "mfa/util.hpp"
+#include    "util.hpp"
 
 #include    <Eigen/Dense>
 #include    <vector>

@@ -6,7 +6,7 @@
 // tpeterka@mcs.anl.gov
 //--------------------------------------------------------------
 
-#include    <mfa/mfa.hpp>
+#include    "mfa.hpp"
 
 #include    <diy/master.hpp>
 #include    <diy/reduce-operations.hpp>

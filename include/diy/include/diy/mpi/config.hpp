@@ -19,7 +19,7 @@
 /// only included for the library's compilation units.
 #ifdef DIY_HAS_MPI
 #  if DIY_HAS_MPI
-#    include <mpi.h>
+#    include "/usr/local/include/mpi.h"
 #  else
 #    include "no-mpi.hpp"
 #  endif
