@@ -24,6 +24,9 @@
 
 #include    <random>
 
+#include <cmath>
+#include <fstream>
+
 using namespace std;
 
 using Index = MatrixXf::Index;
@@ -222,6 +225,39 @@ struct BlockBase
             vars[i].mfa_data->set_knots(*input);
             mfa->FixedEncode(*(vars[i].mfa_data), *input, nctrl_pts, a->verbose, a->weighted);
         }
+
+		// ------- Save mfab file which is the minimal mfa file, jianxin add start -------
+#if 1 // turn off for testing the GAN based parameter learning idea
+		unsigned int knots_size = vars[0].mfa_data->tmesh.all_knots[0].size();
+		unsigned int degree = vars[0].mfa_data->p(0);
+		unsigned int ctrl_pts_size = vars[0].mfa_data->tmesh.tensor_prods[0].ctrl_pts.rows(); // = (knots_size - 2- 1)^3
+		unsigned int ctrl_pts_size_per_dim = std::cbrt(ctrl_pts_size);
+		std::cout << "=======End of encoding=======" << std::endl;
+		std::cout << "degree: " << degree << std::endl;
+		std::cout << "knots_size: " << knots_size << std::endl;
+		std::cout << "ctrlpts_size: " << ctrl_pts_size_per_dim << std::endl;
+
+		std::ofstream wf("test.mfab", std::ios::out | std::ios::binary);
+   		if(!wf) {
+    		cout << "Cannot open file!" << endl;
+  		}
+		// Write degree
+    	wf.write((char *)&degree, sizeof(unsigned int));
+    	// Write number of knots on each dimension
+    	wf.write((char *)&knots_size, sizeof(unsigned int));
+		// Write all the knots
+   		for(unsigned int i = 0; i < knots_size; i++)
+    		wf.write((char *)&vars[0].mfa_data->tmesh.all_knots[0][i], sizeof(float));
+		for(unsigned int i = 0; i < knots_size; i++)
+    		wf.write((char *)&vars[0].mfa_data->tmesh.all_knots[1][i], sizeof(float));
+   		for(unsigned int i = 0; i < knots_size; i++)
+    		wf.write((char *)&vars[0].mfa_data->tmesh.all_knots[2][i], sizeof(float));
+		// Write all ctrl points
+		for(unsigned int i = 0; i < ctrl_pts_size; i++)
+    		wf.write((char *)&vars[0].mfa_data->tmesh.tensor_prods[0].ctrl_pts(i), sizeof(float));
+   		wf.close();
+#endif
+		// ------- Save mfab file which is the minimal mfa file, jianxin add end -------
     }
 
     // adaptively encode block to desired error limit
@@ -281,6 +317,17 @@ struct BlockBase
             vars[i].mfa_data->set_knots(*input);
             mfa->AdaptiveEncode(*(vars[i].mfa_data), *input, err_limit, a->verbose, a->weighted, extents, max_rounds);
         }
+
+		// ------- Save mfab file which is the minimal mfa file, jianxin add start -------
+		unsigned int knots_size = vars[0].mfa_data->tmesh.all_knots[0].size();
+		unsigned int degree = vars[0].mfa_data->p(0);
+		unsigned int ctrl_pts_size = vars[0].mfa_data->tmesh.tensor_prods[0].ctrl_pts.rows(); // = (knots_size - 2- 1)^3
+		unsigned int ctrl_pts_size_per_dim = std::cbrt(ctrl_pts_size);
+		std::cout << "=======End of encoding=======" << std::endl;
+		std::cout << "degree: " << degree << std::endl;
+		std::cout << "knots_size: " << knots_size << std::endl;
+		std::cout << "ctrlpts_size: " << ctrl_pts_size_per_dim << std::endl;
+
     }
 
     // decode entire block
@@ -354,6 +401,11 @@ struct BlockBase
             mfa->DecodePt(*(vars[i].mfa_data), param, var_cpt);
             cpt(dom_dim + i) = var_cpt(0);
         }
+        
+        // if (cp.gid() == 4) {
+            std::cout << "block result: " << var_cpt(0) << std::endl;
+        // }
+
     }
 
     // differentiate one point
@@ -634,6 +686,13 @@ struct BlockBase
             fprintf(stderr, "RMS error              (var %d)    = %e\n",  all_max_rms_var,      all_max_rms_err);
             fprintf(stderr, "normalized RMS error   (var %d)    = %e\n",  all_max_norm_rms_var, all_max_norm_rms_err);
         }
+
+		std::ofstream outf_error;
+		outf_error.open("error.txt", std::ios_base::app);
+		outf_error << all_max_rms_err;
+		outf_error << "\n";
+		outf_error.close();
+
 
        cerr << "\n-----------------------------------" << endl;
 

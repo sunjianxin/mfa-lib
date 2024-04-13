@@ -189,7 +189,7 @@ namespace io
 
         offset_t    footer_offset = f.size() - sizeof(size_t);
         size_t footer_size;
-
+		
         // Read the size
         f.read_at_all(footer_offset, (char*) &footer_size, sizeof(footer_size));
 
@@ -208,7 +208,7 @@ namespace io
         assigner.set_nblocks(static_cast<int>(all_offset_counts.size()));
         std::vector<int> gids;
         assigner.local_gids(comm.rank(), gids);
-
+		
         for (size_t i = 0; i < gids.size(); ++i)
         {
             if (gids[i] != all_offset_counts[gids[i]].gid)

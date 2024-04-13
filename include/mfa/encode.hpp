@@ -24,7 +24,8 @@
 #include    <iomanip>
 #include    <fstream>
 #include    <sstream>
-#include "/usr/local/include/mpi.h"
+// #include "/usr/local/include/mpi.h"
+#include "/usr/include/x86_64-linux-gnu/mpich/mpi.h"
 
 #ifndef      MFA_NO_WEIGHTS
 

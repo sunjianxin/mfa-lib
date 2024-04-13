@@ -223,7 +223,20 @@ namespace mfa
                 int                     cur_dim,            // current dimension
                 T                       u) const            // parameter value
         {
-            int nctrl_pts = tmesh.all_knots[cur_dim].size() - p(cur_dim) - 1;
+            int nctrl_pts = tmesh.all_knots[cur_dim].size() - p(cur_dim) - 1; // 64 - 2 - 1 = 61
+
+#if 0			// jianxin
+			std::cout << "nctrl_pts: " << std::endl;
+			for (int k = 0; k < 62; k++) {
+				std::cout << tmesh.all_knots[cur_dim][k] << ", ";
+			}
+			std::cout << std::endl;
+			for (int k = 0; k < 64; k++) {
+				std::cout << tmesh.all_knots[cur_dim][k] << ", ";
+			}
+			std::cout << std::endl;
+			std::cout << "tmesh.all_knots[cur_dim][nctrl_pts]" << tmesh.all_knots[cur_dim][nctrl_pts] << std::endl;
+#endif			// jianxin
 
             if (u == tmesh.all_knots[cur_dim][nctrl_pts])
                 return nctrl_pts - 1;
@@ -372,8 +385,17 @@ namespace mfa
             // nb. we do not need to zero out the entirety of N, since the existing entries of N 
             //     are never accessed (they are always overwritten first)
             N[0] = 1;   
+			std::cout << "-N size: " << N.size() << std::endl;
+			std::cout << "-p(cur_dim): " << p(cur_dim) << std::endl;
+			std::cout << "-N[0]: " << N[0] << std::endl;
+			std::cout << "-N[1]: " << N[1] << std::endl;
+			std::cout << "-N[2]: " << N[2] << std::endl;
 
-            for (int j = 1; j <= p(cur_dim); j++)
+			std::cout << "-bfi.right.at(0): " << bfi.right.at(0) << std::endl;
+			std::cout << "-bfi.right.at(1): " << bfi.right.at(1) << std::endl;
+			std::cout << "-bfi.right.at(2): " << bfi.right.at(2) << std::endl;
+
+            for (int j = 1; j <= p(cur_dim); j++) // p(cur_dim) = 2
             {
                 // left[j] is u - the jth knot in the correct level to the left of span
                 // right[j] is the jth knot in the correct level to the right of span - u
@@ -389,6 +411,14 @@ namespace mfa
                 }
                 N[j] = saved;
             }
+
+			std::cout << "-after N[0]: " << N[0] << std::endl;
+			std::cout << "-after N[1]: " << N[1] << std::endl;
+			std::cout << "-after N[2]: " << N[2] << std::endl;
+			std::cout << "-after bfi.right.at(0): " << bfi.right.at(0) << std::endl;
+			std::cout << "-after bfi.right.at(1): " << bfi.right.at(1) << std::endl;
+			std::cout << "-after bfi.right.at(2): " << bfi.right.at(2) << std::endl;
+
         }
 
         // Faster version of DerBasisFuns.
@@ -519,12 +549,14 @@ namespace mfa
             // lower triangle is reciprocal of knot differences
             bfi.ndu[0][0] = 1.0;
 
+			std::cout << "span: " << span << std::endl;
             // fill ndu / compute 0th derivatives
             for (int j = 1; j <= deg; j++)
             {
                 bfi.left[j]  = u - tmesh.all_knots[cur_dim][span + 1 - j];
                 bfi.right[j] = tmesh.all_knots[cur_dim][span + j] - u;
-
+				std::cout << "u: " << u << ";, v: " << tmesh.all_knots[cur_dim][span + 1 - j] << std::endl;
+				// std::cout << "left, right: " << bfi.left[j] << ", " << bfi.right[j] << std::endl;
                 T saved = 0.0;
                 for (int r = 0; r < j; r++)
                 {
@@ -537,12 +569,14 @@ namespace mfa
                 }
                 bfi.ndu[j][j] = saved;
             }
+		    std::cout << "ndu[0][0/1/2]: " << bfi.ndu[0][0] << ", " << bfi.ndu[0][1] << ", " << bfi.ndu[0][2] << std::endl;   
+            std::cout << "ndu[1][0/1/2]: " << bfi.ndu[1][0] << ", " << bfi.ndu[1][1] << ", " << bfi.ndu[1][2] << std::endl;   
+            std::cout << "ndu[2][0/1/2]: " << bfi.ndu[2][0] << ", " << bfi.ndu[2][1] << ", " << bfi.ndu[2][2] << std::endl;   
 
             // Copy 0th derivatives
             for (int j = 0; j <= deg; j++)
                 D[0][j] = bfi.ndu[j][deg];
-                
-            // Compute 1st derivatives
+                       // Compute 1st derivatives
             T d = 0.0;
             D[1][0]     = -bfi.ndu[0][pk] * bfi.ndu[deg][0];
             D[1][deg]   = bfi.ndu[deg-1][pk] * bfi.ndu[deg][deg-1];

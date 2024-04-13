@@ -122,17 +122,32 @@ namespace mfa
             for (size_t i = 0; i < dom_dim; i++)
             {
                 N[i].resize(decoder.q[i], 0);
+				std::cout << "decoder.q[i]" << decoder.q[i] << std::endl;
             }
+			std::cout << "N.size(): " << N.size() << std::endl;
+			std::cout << "N.at(0).size(): " << N.at(0).size() << std::endl;
+			std::cout << "N.at(1).size(): " << N.at(1).size() << std::endl;
+			std::cout << "N.at(2).size(): " << N.at(2).size() << std::endl;
+
+			std::cout << "bfi.right.at(0): " << bfi.right.at(0) << std::endl;
+			std::cout << "bfi.right.at(1): " << bfi.right.at(1) << std::endl;
+			std::cout << "bfi.right.at(2): " << bfi.right.at(2) << std::endl;
 
             // t and td are multi-dim arrays containing intermediate sums formed by k-mode vector products
             t.resize(dom_dim);
             td.resize(dom_dim+1);            
+			std::cout << "ds.size: " << decoder.ds.size() << std::endl;
+			std::cout << "dss: " << decoder.ds[0] << ", " << decoder.ds[1] << ", " << decoder.ds[2] << std::endl;
             for (int i = 0; i < dom_dim - 1; i++)
             {
                 t[i].resize(decoder.tot_iters / decoder.ds[i+1]);
 
             }
+			std::cout << "t.at(0).size(): " << t.at(0).size() << std::endl;
+			std::cout << "t.at(1).size(): " << t.at(1).size() << std::endl;
+			std::cout << "t.at(2).size(): " << t.at(2).size() << std::endl;
             t[dom_dim-1].resize(1);
+			std::cout << "t.at(2).size(): " << t.at(2).size() << std::endl;
 
             for (int d = 0; d < dom_dim + 1; d++)
             {
@@ -140,6 +155,7 @@ namespace mfa
                 for (int i = 0; i < dom_dim - 1; i++)
                 {
                     td[d][i].resize(decoder.tot_iters / decoder.ds[i+1]);
+					std::cout << "td[" << d << "][" << i << "]: " << td[d][i].size() << std::endl;
                 }
                 td[d][dom_dim-1].resize(1);
             }
@@ -258,6 +274,8 @@ namespace mfa
             verbose(verbose_),
             saved_basis(saved_basis_)
         {
+			// std::cout << "in Decoder constructor" << std::endl;
+			// std::cout << saved_basis << std::endl;
             // ensure that encoding was already done
             if (!mfa_data.p.size()                               ||
                 !mfa_data.tmesh.all_knots.size()                 ||
@@ -275,16 +293,18 @@ namespace mfa
             cs = VectorXi::Ones(mfa_data.dom_dim);
             ds.resize(dom_dim, 1);
             q.resize(dom_dim);
-            for (size_t i = 0; i < mfa_data.p.size(); i++)   // for all dims
+            for (size_t i = 0; i < mfa_data.p.size(); i++)   // for all dims, mfa_data.p.size(): 3, mfa_data.p(0/1/2) = 2 polynomial degree 
             {
                 q[i] = mfa_data.p(i) + 1;
                 if (i > 0)
                 {
-                    cs[i] = cs[i - 1] * mfa_data.tmesh.tensor_prods[0].nctrl_pts[i - 1];
+                    cs[i] = cs[i - 1] * mfa_data.tmesh.tensor_prods[0].nctrl_pts[i - 1]; // mfa_data.tmesh.tensor_prods.size() = 1, mfa_data.tmesh.tensor_prods[0].nctrl_pts: 61, 61, 61
                     ds[i] = ds[i-1] * q[i];
                 }
             }
             ct.resize(tot_iters, mfa_data.p.size());
+
+			// std::cout << "ct size: " << ct.size() << std::endl;
 
             // compute coordinates of first control point of curve corresponding to this iteration
             // these are relative to start of the box of control points located at co
@@ -301,6 +321,7 @@ namespace mfa
             }
 
             jumps = ct * cs;
+			// std::cout << "jumps.size: " << jumps.size() << std::endl;
         }
 
         ~Decoder() {}
@@ -1277,6 +1298,9 @@ exit(1);
             for (int j = 0; j < dom_dim; j++)
                 start_ctrl_idx += (di.span[j] - mfa_data.p(j)) * cs[j];
 
+
+			std::cout << "td: " << di.td[0][2][0] << " " << di.td[1][2][0] << " " << di.td[2][2][0] << std::endl;
+			std::cout << "before di.t[0]: " << di.t[0][0] << " " <<  di.t[0][1] << " " <<di.t[0][2] << " " <<di.t[0][3] << " " <<di.t[0][4] << " " <<di.t[0][5] << " " <<di.t[0][6] << " " <<di.t[0][7] << " " <<di.t[0][8] <<std::endl;
             // Compute the 0-mode vector product
             // This is the only time we need to access the control points
             for (int m = 0, id = 0; m < tot_iters; m += q0, id++)
@@ -1285,6 +1309,7 @@ exit(1);
 
                 // Separate 1st iteration to avoid zero-initialization
                 di.td[0][0][id] = di.M[0][0][0] * tensor.ctrl_pts(di.ctrl_idx);
+				std::cout << "M[0][0][0]: " << di.M[0][0][0] << "; v: " << tensor.ctrl_pts(di.ctrl_idx) << std::endl;
                 di.t[0][id] = di.M[1][0][0] * tensor.ctrl_pts(di.ctrl_idx);
                 for (int a = 1; a < q0; a++)
                 {
@@ -1296,8 +1321,11 @@ exit(1);
                     di.t[0][id] += di.M[1][0][a] * tensor.ctrl_pts(di.ctrl_idx + a);        // basis fun * ctl pts
                 }
             }
+			std::cout << "td: " << di.td[0][2][0] << " " << di.td[1][2][0] << " " << di.td[2][2][0] << std::endl;
+			std::cout << "di.t[0]: " << di.t[0][0] << " " <<  di.t[0][1] << " " <<di.t[0][2] << " " <<di.t[0][3] << " " <<di.t[0][4] << " " <<di.t[0][5] << " " <<di.t[0][6] << " " <<di.t[0][7] << " " <<di.t[0][8] <<std::endl;
+			std::cout  << "end_d: " << end_d << std::endl;
             for (int d = 1; d < end_d; d++) // In this special case, the values for d >= 1 are the same 
-            {
+            {	
                 for (int id = 0; id < di.td[d][0].size(); id++)
                 {
                     di.td[d][0][id] = di.t[0][id];
@@ -1356,8 +1384,9 @@ exit(1);
             for (int i = 0; i < dom_dim; i++)
             {
                 di.span[i] = mfa_data.FindSpan(i, param(i));
+				std::cout << "di.span[i]" << di.span[i] << std::endl;
 
-                mfa_data.FastBasisFuns(i, param(i), di.span[i], di.N[i], di.bfi);
+                mfa_data.FastBasisFuns(i, param(i), di.span[i], di.N[i], di.bfi); // fill di.N[i]
             }
 
             // compute linear index of first control point
@@ -1365,7 +1394,7 @@ exit(1);
             for (int j = 0; j < mfa_data.dom_dim; j++)
                 start_ctrl_idx += (di.span[j] - mfa_data.p(j)) * cs[j];
 
-
+			std::cout << "start_ctrl_idx: " << start_ctrl_idx << std::endl;
             // * The remaining loops perform the sums and products of basis functions across different
             //   dimensions. This loop looks different from the old VolPt loop in order to remove the
             //   step to check if a control point is at the "end" of some dimension. Instead, we compute
@@ -1376,17 +1405,23 @@ exit(1);
             //   the time spent accumulating basis functions is reduced by about 10-20%
 
             // First domain dimension, we multiply basis functions with control points
+			std::cout << "ctrl_pts size: " << tensor.ctrl_pts.rows() << " x " << tensor.ctrl_pts.cols() << std::endl;
+			std::cout << "tot_iters: " << tot_iters << std::endl;
+			std::cout << "q0: " << q0 << std::endl;
             for (int m = 0, id = 0; m < tot_iters; m += q0, id++)
             {
                 di.ctrl_idx = start_ctrl_idx + jumps(m);
-
-                di.t[0][id] = di.N[0][0] * tensor.ctrl_pts(di.ctrl_idx);
+				std::cout << "di.ctrl_idx: " << di.ctrl_idx << std::endl;
+				std::cout << "id: " << id << std::endl;
+                di.t[0][id] = di.N[0][0] * tensor.ctrl_pts(di.ctrl_idx); // tensor.ctrl_pts is a 2d matrix with size: [61x61x61, 1] in row major order
                 for (int a = 1; a < q0; a++)
                 {
                     di.t[0][id] += di.N[0][a] * tensor.ctrl_pts(di.ctrl_idx + a);
                 }
-            }
-
+            	std::cout << "di.t[0][id]: " << di.t[0][id] << std::endl;
+			}
+			
+			std::cout << "di.N[2][0]: " << di.N[2][0] << std::endl;
             // For all subsequent dimensions, we multiply basis functions with temporary sums
             int qcur = 0, tsz = 0;
             for (int k = 1; k < mfa_data.dom_dim; k++)
@@ -1402,8 +1437,20 @@ exit(1);
                     }
                 }
             }
+		
+			std::cout << "di.N[2][0]: " << di.N[2][0] << std::endl;
+			for (int i = 0; i < 9; i++) {
+				std::cout << "di.t[0][" << i << "]: " << di.t[0][i] << std::endl;
+			}
+			for (int i = 0; i < 3; i++) {
+				std::cout << "di.t[1][" << i << "]: " << di.t[1][i] << std::endl;
+			}
+			for (int i = 0; i < 1; i++) {
+				std::cout << "di.t[2][" << i << "]: " << di.t[2][i] << std::endl;
+			}
 
             out_pt(0) = di.t[mfa_data.dom_dim - 1][0];
+			std::cout << "out_pt(0): " << out_pt(0) << std::endl;
         }
 
         // compute a point from a NURBS curve at a given parameter value
