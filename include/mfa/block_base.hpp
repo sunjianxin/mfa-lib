@@ -403,7 +403,7 @@ struct BlockBase
         }
         
         // if (cp.gid() == 4) {
-            std::cout << "block result: " << var_cpt(0) << std::endl;
+            // std::cout << "block result: " << var_cpt(0) << std::endl;
         // }
 
     }
@@ -635,7 +635,7 @@ struct BlockBase
             fprintf(stderr, "]\n");
 
             cerr << "-----------------------------" << endl;
-
+			cerr << "error: " << error << endl;
             if (error)
             {
                 T rms_err = sqrt(sum_sq_errs[i] / (input->domain.rows()));
